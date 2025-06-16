@@ -7,7 +7,9 @@ namespace metrics_task {
 
 class MetricsWriterInterface {
 public:
-    virtual void writeMetric(const std::string& metric) = 0;
+    virtual void writeMetric(std::string metric) = 0;
+
+    virtual void stopWriting() = 0;
 
     virtual ~MetricsWriterInterface() = default;
 };

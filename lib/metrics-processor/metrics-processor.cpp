@@ -9,18 +9,37 @@ metrics_task::MetricsProcessor::MetricsProcessor(const std::vector<AbstractMetri
     : metrics_(metrics), writer_(writer), processing_interval_in_ms(processing_interval) {}
 
 void metrics_task::MetricsProcessor::startProcessing() {
-    start_time_ = std::chrono::system_clock::now();
-    processing_thread_ = std::thread(&MetricsProcessor::loopMetricsProcessing, this);
+    std::lock_guard lock(mutex_);
+    if (!running_) {
+        start_time_ = std::chrono::system_clock::now();
+        running_ = true;
+        processing_thread_ = std::thread(&MetricsProcessor::loopMetricsProcessing, this);
+    }
 }
 
 void metrics_task::MetricsProcessor::stopProcessing() {
+    {
+        std::lock_guard lock(mutex_);
+        running_ = false;
+    }
+    cv_.notify_all();
+
     if (processing_thread_.joinable()) {
         processing_thread_.join();
     }
+
+    writer_->stopWriting();
 }
 
 void metrics_task::MetricsProcessor::loopMetricsProcessing() {
     while (true) {
+        {
+            std::unique_lock lock(mutex_);
+            if (!running_) {
+                break;
+            }
+        }
+
         auto timestamp_copy = start_time_;
 
         auto futures_ptr = std::make_shared<std::vector<std::future<std::string>>>();
@@ -46,6 +65,7 @@ void metrics_task::MetricsProcessor::loopMetricsProcessing() {
             for (auto& future : *futures_ptr) {
                 resulting_string << future.get();
             }
+            resulting_string << std::endl;
 
             if (writer_) {
                 writer_->writeMetric(resulting_string.str());
@@ -53,6 +73,14 @@ void metrics_task::MetricsProcessor::loopMetricsProcessing() {
         });
 
         start_time_ += processing_interval_in_ms;
-        std::this_thread::sleep_until(start_time_);
+
+        std::unique_lock lock(mutex_);
+        cv_.wait_until(lock, start_time_, [this] {
+            return !running_;
+        });
+
+        if (!running_) {
+            break;
+        }
     }
 }

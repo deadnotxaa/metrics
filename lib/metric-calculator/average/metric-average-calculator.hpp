@@ -7,6 +7,7 @@ namespace metrics_task {
 
 template<typename T>
 class MetricAverageCalculator final : public MetricCalculatorInterface {
+public:
     void calculate(const std::string& metric_name, std::vector<std::any> metric_values, std::promise<std::string> metric_promise) override {
         T accumulator = 0;
         for (auto& value : metric_values) {
@@ -16,6 +17,7 @@ class MetricAverageCalculator final : public MetricCalculatorInterface {
         metric_promise.set_value(" \"" + metric_name + "\"" + " " +
             std::to_string(static_cast<double>(accumulator) / static_cast<double>(metric_values.size())));
     }
+
 };
 
 } // metrics_task

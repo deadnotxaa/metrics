@@ -23,8 +23,6 @@ public:
     }
 
     std::future<std::string> getCalculatedMetric() override {
-        // std::cout << "In worker. system clock in ns: " << std::chrono::system_clock::now().time_since_epoch() << std::endl;
-
         std::promise<std::string> metric_calculated;
         std::future<std::string> metric_calculated_future = metric_calculated.get_future();
 

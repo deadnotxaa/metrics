@@ -32,6 +32,8 @@ private:
 
     std::thread processing_thread_;
     std::condition_variable cv_;
+    std::mutex mutex_;
+    bool running_ = false;
 
     dp::thread_pool<> pool;
 };

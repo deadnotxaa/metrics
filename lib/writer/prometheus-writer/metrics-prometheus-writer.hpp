@@ -6,7 +6,9 @@
 namespace metrics_task {
 class MetricsPrometheusWriter final : public MetricsWriterInterface {
 public:
-    void writeMetric() override;
+    void writeMetric(std::string metric) override;
+
+    void stopWriting() override;
 
 private:
 
