@@ -1,2 +1,4 @@
 # metrics
-Internship task: C++ library for collecting metrics
+C++ library for collecting metrics
+
+

@@ -6,6 +6,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC metrics-writer-interface
+        PUBLIC metrics-prometheus-writer
         PUBLIC metrics-processor
         PUBLIC metric
 )

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <atomic>
+#include <filesystem>
 
 #include "concurrentqueue.h"
 
@@ -13,7 +14,11 @@ namespace metrics_task {
 
 class MetricsFileWriter final : public MetricsWriterInterface {
 public:
-    explicit MetricsFileWriter(const std::string& file_path = "metrics.txt") { // TODO: use std::filesystem and add check for dir existence
+    explicit MetricsFileWriter(const std::filesystem::path& file_path = "metrics.txt") {
+        if (!std::filesystem::exists(file_path)) {
+            std::filesystem::create_directories(std::filesystem::canonical(file_path.parent_path()));
+        }
+
         file_stream_.open(file_path, std::ios::out | std::ios::app);
         running_ = true;
         writing_thread_ = std::thread(&MetricsFileWriter::process, this);

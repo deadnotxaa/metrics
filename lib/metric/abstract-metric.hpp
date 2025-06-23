@@ -3,6 +3,7 @@
 
 #include <any>
 #include <future>
+#include <string>
 
 namespace metrics_task {
 

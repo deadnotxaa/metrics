@@ -21,4 +21,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(thread-pool)
 
-set(CMAKE_CXX_FLAGS "-fexperimental-library")
+# prometheus-cpp
+FetchContent_Declare(
+        prometheus-cpp
+        GIT_REPOSITORY https://github.com/jupp0r/prometheus-cpp.git
+        GIT_TAG v1.2.4
+)
+
+# disable zlib and libcurl
+set(ENABLE_COMPRESSION OFF CACHE BOOL "Disable compression")
+set(ENABLE_PUSH OFF CACHE BOOL "Disable push metrics")
+set(ENABLE_TESTING OFF CACHE BOOL "Disable tests to speed up build")
+
+FetchContent_MakeAvailable(prometheus-cpp)
+
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "-fexperimental-library")
+endif ()
