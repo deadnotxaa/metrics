@@ -25,7 +25,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     // Create Processor (he will process all metrics with specified interval and then send them to the specific writer)
     metrics_task::MetricsProcessor processor(
         {metric, metric2},
-        new metrics_task::MetricsFileWriter(),
+        new metrics_task::MetricsPrometheusWriter({"CPU Burst", "HTTP Requests RPS"}),
         std::chrono::milliseconds(1000)
     );
 

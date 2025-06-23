@@ -5,6 +5,7 @@
 #include <fstream>
 #include <atomic>
 #include <filesystem>
+#include <thread>
 
 #include "concurrentqueue.h"
 

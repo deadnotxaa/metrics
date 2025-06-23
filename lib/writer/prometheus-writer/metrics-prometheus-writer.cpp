@@ -2,15 +2,34 @@
 
 namespace metrics_task {
 
-MetricsPrometheusWriter::MetricsPrometheusWriter(const std::vector<std::string>& metrics_names,
-    const std::string& endpoint) : exposer_endpoint_(endpoint), metric_names_(metrics_names) {
+MetricsPrometheusWriter::MetricsPrometheusWriter(const std::vector<std::string>& metric_names,
+    const std::string& endpoint) : exposer_endpoint_(endpoint) {
+
+
+    std::vector<std::string> prometheus_names;
+    for (auto& metric_name : metric_names) {
+        std::string prometheus_name = metric_name;
+
+        std::ranges::replace(prometheus_name, ' ', '_');
+        std::ranges::transform(prometheus_name, prometheus_name.begin(),
+                               [](const unsigned char c){ return std::tolower(c);}
+        );
+
+        prometheus_names.push_back(prometheus_name);
+    }
+
+    metric_names_ = prometheus_names;
+
+    for (size_t i = 0; i < metric_names.size(); ++i) {
+        metric_names_low_map_[metric_names[i]] = prometheus_names[i];
+    }
 
     exposer_ = std::make_unique<prometheus::Exposer>(endpoint);
     registry_ = std::make_shared<prometheus::Registry>();
 
     exposer_->RegisterCollectable(registry_);
 
-    for (auto& i : metrics_names) {
+    for (auto& i : metric_names_) {
         const auto family = &prometheus::BuildGauge()
             .Name(i)
             .Help(i + " Metric")
@@ -62,7 +81,7 @@ void MetricsPrometheusWriter::process() {
                 if (matches.size() >= 3) {
                     std::string metric_name = matches[1].str();
                     std::string metric_value = matches[2].str();
-                    gauges_[metric_name]->Set(std::stod(metric_value));
+                    gauges_[metric_names_low_map_[metric_name]]->Set(std::stod(metric_value));
                     searchStart = matches.suffix().first;
                 }
             }

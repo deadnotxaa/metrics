@@ -39,11 +39,12 @@ private:
 
     std::unordered_map<std::string, prometheus::Family<prometheus::Gauge>*> families;
     std::unordered_map<std::string, prometheus::Gauge*> gauges_;
+    std::unordered_map<std::string, std::string> metric_names_low_map_;
 
     std::thread processing_thread_;
     std::atomic<bool> running_{false};
     std::string exposer_endpoint_;
-    std::vector<std::string> metric_names_;
+    std::vector<std::string> metric_names_{};
 
     moodycamel::ConcurrentQueue<std::string> writer_queue_;
 };
