@@ -5,4 +5,4 @@
 
 
 ## Description
-**Description of solution is available at: [EN](docs/DESCR_EN.md) / [RU](docs/DESCR_RU.md)**
+**Description of solution is available at: [EN (not yet available)](docs/DESCR_EN.md) / [RU (available)](docs/DESCR_RU.md)**
